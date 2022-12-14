@@ -1,55 +1,34 @@
-import { useState } from "react";
+import { Container } from "@mui/material";
+import { useEffect, useState } from "react";
+import AppBar from "./components/AppBar";
+import TransactionForm from "./components/TransactionForm";
+import TransactionsList from "./components/TransactionsList";
+
 function App() {
-  const [form, setForm] = useState({
-    amount: 0,
-    description: "",
-    date: "",
-  });
+  const [transactions, setTransactions] = useState([]);
 
-  const handleInput = (e) => {
-    console.log(e.target.value);
-    setForm({ ...form, [e.target.name]: e.target.value });
+  useEffect(() => {
+    fetchTransaction();
+  }, []);
+
+  const fetchTransaction = async () => {
+    const res = await fetch("http://localhost:5000/transaction");
+    const { data } = await res.json();
+    console.log(data);
+    setTransactions(data);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(form);
-
-    fetch("http://localhost:5000/", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: form,
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-  };
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          name="amount"
-          onChange={handleInput}
-          value={form.amount}
-          placeholder="Enter transection amount"
+      <AppBar />
+      <Container>
+        <TransactionForm fetchTransaction={fetchTransaction} />
+        <TransactionsList
+          transactions={transactions}
+          fetchTransaction={fetchTransaction}
         />
-        <input
-          type="text"
-          name="description"
-          onChange={handleInput}
-          value={form.description}
-          placeholder="Enter transection details"
-        />
-        <input
-          type="date"
-          name="date"
-          onChange={handleInput}
-          value={form.date}
-        />
-        <input type="submit" value="Submit" />
-      </form>
+      </Container>
+      <br />
     </div>
   );
 }

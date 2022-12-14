@@ -1,20 +1,22 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
+import bodyParser from "body-parser";
+import TransactionRoutes from "./routes/transactionRoutes.js";
+import connect from "./database/mongodb.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.user(cors());
+app.use(cors());
+app.use(bodyParser.json());
+app.use("/transaction", TransactionRoutes);
 
-await mongoose.connect(
-  "mongodb+srv://expense-app:U0N7iYIDZzTM4NHi@cluster0.oiptd.mongodb.net/?retryWrites=true&w=majority"
-);
-console.log("Mongodb connection successfully");
+await connect();
 
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
 app.listen(port, () => {
   console.log("Server Running at: http://localhost:5000");
 });
